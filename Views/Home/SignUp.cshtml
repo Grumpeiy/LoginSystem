@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "Sign Up";
+}
+<h1>@ViewData["Title"]</h1>
+
+<body>
+    <div id="signUp-box">
+        <div class="center">
+            <input type="text" id="email" name="email" placeholder="E-mail" required />
+            <input type="password" id="password" name="password" placeholder="Password" required />
+            <input type="submit" id="saveData" name="signup_submit" value="Sign Up" />
+        </div>
+    </div>
+</body>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyAYP6e1miAEaiN2p01NwEyXmNFaclblAX8",
+        authDomain: "login-system-55e9f.firebaseapp.com",
+        databaseURL: "https://login-system-55e9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "login-system-55e9f",
+        storageBucket: "login-system-55e9f.appspot.com",
+        messagingSenderId: "995456184025",
+        appId: "1:995456184025:web:b3d727028cb34255dd18c8"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("saveData").addEventListener("click", function (event) {
+            event.preventDefault();
+
+            let email = document.getElementById("email").value.trim();
+            let password = document.getElementById("password").value.trim();
+            let signUpButton = document.getElementById("saveData");
+
+            if (email === "" || password === "") {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            signUpButton.disabled = true;
+
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+
+                    set(ref(database, 'users/' + user.uid), { email: email });
+
+                    alert("User registered successfully!");
+
+                    window.location.href = "/Home/Login";
+
+                })
+                .catch((error) => {
+                    alert("Error: " + error.message);
+                    signUpButton.disabled = false;
+                });
+        });
+    });
+</script>
